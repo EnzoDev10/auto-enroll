@@ -20,7 +20,9 @@ coupons = requests.get(coupons_url)
 
 coupons_soup = BeautifulSoup(coupons.content, "lxml")
 
-
+# Doesnt work
+# https://www.udemy.com/course/nextjs-web-dev-master-this-powerful-react-framework/?couponCode=FROLICINFIELDS
+# https://www.udemy.com/course/git-github-for-beginners-from-start-to-star/?couponCode=SPRINGFLING
 try:
     cards = coupons_soup.find_all("div", class_="col-md-4 col-sm-6")
 
@@ -29,36 +31,24 @@ try:
             rating_tag = card.find("i", class_="fa-star").parent.text
             rating = float(rating_tag.split(":")[-1].split("/")[0])
 
-
         except Exception as f:
             print("\n Something went wrong with this course. Pass")
             pass
 
-       
         else:
             if rating > minimum_rating:
-                course_url = card.find("a", class_="button-icon")["href"]
-
-                course = requests.get(course_url)
-
-                course_soup = BeautifulSoup(course.content, "lxml")
-
-                udemy_url = course_soup.find("a", class_="button-icon")["href"]
+                course_url = card.find("a", class_="button-icon")["href"].replace(
+                    "free-udemy-course", "out"
+                )
 
                 options = Options()
                 options.add_argument("--lang=GB")
 
                 driver = UC.Chrome(options=options)
-                driver.get(udemy_url)
-
-                # Most typical path (8/12)
-                udemy_price_xpath = "//*[@id='main-content-anchor']/div[3]/div[1]/div[2]/div[1]/div[2]/div/div/div[1]/div/div[2]/div/div/div[1]/span[2]"
-                # Example: https://www.udemy.com/course/capture-edit-render-create-uhd-screen-videos-with-nvidia/?couponCode=MAR-2024-A
-
+                driver.get(course_url)
                 # Own path
                 try:
                     udemy_price = driver.find_element(By.XPATH, udemy_price_xpath)
-                
 
                     if udemy_price.text == "Free":
                         print("\n", udemy_price.text)
@@ -74,10 +64,8 @@ try:
                 except Exception:
                     print("Element not found")
                     pass
-                    
 
                 # ! GET SELENIUM TO CLICK ON THE LINK TO ENROLL, INPUT THE EMAIL AND PASSWORD DATA, AND CLICK ENROLL AGAIN
-
 
 
 except Exception as e:
